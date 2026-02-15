@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Bet = {
   id: string;
@@ -17,11 +17,29 @@ function profit(b: Bet) {
 }
 
 export default function ApostasPage() {
-  const [bets, setBets] = useState<Bet[]>([]);
-  const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
-  const [odds, setOdds] = useState<string>("2.00");
-  const [stake, setStake] = useState<string>("10");
-  const [result, setResult] = useState<Bet["result"]>("win");
+ const [bets, setBets] = useState<Bet[]>(() => {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem("bets_v1");
+    return raw ? (JSON.parse(raw) as Bet[]) : [];
+  } catch {
+    return [];
+  }
+});
+
+useEffect(() => {
+  try {
+    localStorage.setItem("bets_v1", JSON.stringify(bets));
+  } catch {}
+}, [bets]);
+
+const [date, setDate] = useState<string>(() =>
+  new Date().toISOString().slice(0, 10)
+);
+const [odds, setOdds] = useState<string>("2.00");
+const [stake, setStake] = useState<string>("10");
+const [result, setResult] = useState<Bet["result"]>("win");
+
 
   const summary = useMemo(() => {
     const totalStake = bets.reduce((acc, b) => acc + b.stake, 0);
