@@ -31,3 +31,4 @@ export default function Home() {
     </main>
   );
 }
+<a className="underline text-sm" href="/apostas">Ir para Apostas</a>
